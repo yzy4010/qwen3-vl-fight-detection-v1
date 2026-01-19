@@ -8,6 +8,9 @@ import cv2
 from PIL import Image
 
 from model.base import ModelResult, VideoAnalyzerModel
+from stream.reader import FrameData, VideoStreamReader
+from stream.sampler import FrameSampler
+from window.sliding_window import SlidingWindow, WindowBatch
 from stream.reader import FrameData
 from window.sliding_window import WindowBatch
 
@@ -39,6 +42,18 @@ class VideoAnalyzerPipeline:
             frames = self._prepare_frames(window.frames)
             yield self._model.analyze_window(frames, (window.start, window.end))
 
+    def analyze_stream(
+        self,
+        reader: VideoStreamReader,
+        sampler: FrameSampler,
+        window: SlidingWindow,
+    ) -> Iterator[ModelResult]:
+        sampled_frames = sampler.sample(reader.read())
+        return self.analyze(window.iterate(sampled_frames))
+
+    def _prepare_frames(self, frames: Sequence[FrameData]) -> list[Image.Image]:
+        ordered = sorted(frames, key=lambda item: item.timestamp)
+        selected = ordered[: self._pipeline.max_frames_per_window]
     def _prepare_frames(self, frames: Sequence[FrameData]) -> list[Image.Image]:
         selected = frames[: self._pipeline.max_frames_per_window]
         prepared: list[Image.Image] = []

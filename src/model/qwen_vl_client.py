@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import base64
+from dataclasses import dataclass
+from typing import Sequence
 import json
 from dataclasses import dataclass
 from typing import Any, Sequence
@@ -10,6 +12,7 @@ from PIL import Image
 
 from model.base import ModelResult, VideoAnalyzerModel
 from prompt.fight_prompt import build_fight_prompt
+from utils.json_utils import parse_model_output
 
 
 @dataclass
@@ -18,6 +21,7 @@ class QwenVLConfig:
     model_name: str
     timeout_seconds: int
     max_output_tokens: int
+    temperature: float
 
 
 class QwenVLClient(VideoAnalyzerModel):
@@ -49,6 +53,7 @@ class QwenVLClient(VideoAnalyzerModel):
             "model": self._config.model_name,
             "messages": messages,
             "max_tokens": self._config.max_output_tokens,
+            "temperature": self._config.temperature,
         }
         response = requests.post(
             self._config.api_url,
@@ -58,6 +63,7 @@ class QwenVLClient(VideoAnalyzerModel):
         response.raise_for_status()
         data = response.json()
         content = data["choices"][0]["message"]["content"]
+        parsed = parse_model_output(content, video_time)
         parsed = _safe_json_parse(content)
         return ModelResult(
             video_time=(parsed["video_time"][0], parsed["video_time"][1]),
