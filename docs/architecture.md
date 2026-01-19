@@ -26,6 +26,18 @@ app/cli.py      # CLI：命令行入口
 ## 数据流说明
 
 1. **Stream**：读取视频文件或流，输出连续帧数据。
+   - **时间戳策略**：
+     - 本地 mp4：优先使用 `CAP_PROP_POS_MSEC` 获取帧时间戳；若不可用则回退为 `fps + frame_idx` 计算，并保证单调递增。
+     - 流（m3u8/rtsp）：fps 不可靠，使用 `time.time()` 计算相对时间戳，保证单调递增。
+   - **最小示例**：
+
+```python
+from stream.reader import VideoFrameReader
+
+reader = VideoFrameReader("demo.mp4")
+for frame_bgr, ts_sec in reader:
+    print(frame_bgr.shape, ts_sec)
+```
 2. **Preprocess**：根据配置采样帧率、执行缩放等预处理。
 3. **Window**：按时间窗口与步长组织帧序列。
 4. **Model**：对单窗口帧序列进行分析，返回统一结果 schema。
