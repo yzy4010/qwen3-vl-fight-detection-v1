@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 import cv2
 
-from utils.logging_utils import get_logger
+from src.utils.logging_utils import get_logger
 
 
 FrameTuple = Tuple[Any, float]
