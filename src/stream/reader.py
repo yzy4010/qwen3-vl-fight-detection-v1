@@ -46,7 +46,9 @@ class VideoFrameReader:
         capture = cv2.VideoCapture(self._source)
         self._apply_open_options(capture)
         if not capture.isOpened():
+            self._logger.error("无法打开视频源: %s", self._raw_source)
             raise StreamOpenError(f"无法打开视频源: {self._raw_source}")
+        self._logger.info("视频源已打开，开始读取: %s", self._raw_source)
         try:
             if self._source_type == "file":
                 yield from self._read_file(capture)
@@ -62,7 +64,7 @@ class VideoFrameReader:
         while True:
             success, frame = capture.read()
             if not success:
-                self._logger.info("视频读取结束或读取失败，停止输出帧。")
+                self._logger.info("视频读取结束(EOF)，停止输出帧。")
                 break
             ts_msec = capture.get(cv2.CAP_PROP_POS_MSEC)
             ts_sec = ts_msec / 1000.0 if ts_msec > 0 else 0.0
@@ -81,7 +83,7 @@ class VideoFrameReader:
         while True:
             success, frame = capture.read()
             if not success:
-                self._logger.warning("流读取失败或断流，停止输出帧。")
+                self._logger.warning("流读取结束或断流，停止输出帧。")
                 break
             ts_sec = time.time() - start_time
             if last_ts is not None and ts_sec <= last_ts:
