@@ -3,6 +3,9 @@ from __future__ import annotations
 import base64
 from dataclasses import dataclass
 from typing import Sequence
+import json
+from dataclasses import dataclass
+from typing import Any, Sequence
 
 import requests
 from PIL import Image
@@ -61,6 +64,7 @@ class QwenVLClient(VideoAnalyzerModel):
         data = response.json()
         content = data["choices"][0]["message"]["content"]
         parsed = parse_model_output(content, video_time)
+        parsed = _safe_json_parse(content)
         return ModelResult(
             video_time=(parsed["video_time"][0], parsed["video_time"][1]),
             event=parsed["event"],
@@ -77,3 +81,14 @@ def _image_to_data_url(image: Image.Image) -> str:
     image.save(buffer, format="JPEG")
     encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
     return f"data:image/jpeg;base64,{encoded}"
+
+
+def _safe_json_parse(text: str) -> dict[str, Any]:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start == -1 or end == -1:
+            raise
+        return json.loads(text[start : end + 1])

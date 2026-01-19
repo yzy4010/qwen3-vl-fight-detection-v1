@@ -11,6 +11,8 @@ from model.base import ModelResult, VideoAnalyzerModel
 from stream.reader import FrameData, VideoStreamReader
 from stream.sampler import FrameSampler
 from window.sliding_window import SlidingWindow, WindowBatch
+from stream.reader import FrameData
+from window.sliding_window import WindowBatch
 
 
 @dataclass
@@ -52,6 +54,8 @@ class VideoAnalyzerPipeline:
     def _prepare_frames(self, frames: Sequence[FrameData]) -> list[Image.Image]:
         ordered = sorted(frames, key=lambda item: item.timestamp)
         selected = ordered[: self._pipeline.max_frames_per_window]
+    def _prepare_frames(self, frames: Sequence[FrameData]) -> list[Image.Image]:
+        selected = frames[: self._pipeline.max_frames_per_window]
         prepared: list[Image.Image] = []
         for frame_data in selected:
             resized = cv2.resize(

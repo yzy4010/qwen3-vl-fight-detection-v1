@@ -1,4 +1,5 @@
 # Qwen3-VL Fight Detection v1 (Phase 2)
+# Qwen3-VL Fight Detection v1
 
 本项目为视频打架/斗殴识别的 v1 工程实现，聚焦“视频语义理解 + 可解释判断”的端到端流程，
 并为后续多模型扩展预留接口。
@@ -14,6 +15,11 @@
 - 支持 `mp4` 文件、`m3u8`、`rtsp` 视频流输入
 - 使用滑动时间窗口（默认 2.5 秒）+ 步长（默认 1.0 秒）进行分析
 - 每个窗口按帧率采样多帧，调用 Qwen3-VL（OpenAI-compatible API）输出严格 JSON
+## 功能概览
+
+- 支持 `mp4` 文件、`m3u8`、`rtsp` 视频流输入
+- 使用滑动时间窗口（默认 2.5 秒）进行分析
+- 每个时间窗口采样多帧，调用 Qwen3-VL（OpenAI-compatible API）输出严格 JSON
 - 模型与流水线解耦，方便未来替换或新增模型
 
 ## 环境要求
@@ -45,6 +51,14 @@ pip install -r requirements.txt
 
 统计模式（默认）：
 
+- `window.size_seconds`：时间窗口大小（秒）
+- `sampling.fps`：采样帧率
+- `resize.width / resize.height`：采样帧缩放尺寸
+- `model.api_url / model.name`：模型 API 地址与名称
+- `model.timeout_seconds / model.max_output_tokens`：模型调用参数
+
+## 运行
+
 ```bash
 python -m app.cli --input <video_or_m3u8_or_rtsp>
 ```
@@ -61,6 +75,7 @@ python -m app.cli --input <video_or_m3u8_or_rtsp> --config config/default.yaml -
 {
   "video_time": [start, end],
   "event": "fight|normal|uncertain",
+  "event": "fight | normal | uncertain",
   "confidence": number,
   "scene_description": string,
   "evidence": [string]

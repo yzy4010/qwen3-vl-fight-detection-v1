@@ -10,6 +10,7 @@ from stream.reader import FrameData
 class WindowConfig:
     window_seconds: float
     stride_seconds: float
+    size_seconds: float
 
 
 @dataclass
@@ -51,3 +52,16 @@ class SlidingWindow:
                 actual_start = window_frames[0].timestamp
                 actual_end = window_frames[-1].timestamp
                 yield WindowBatch(frames=window_frames, start=actual_start, end=actual_end)
+        window_start = None
+        for frame in frames:
+            if window_start is None:
+                window_start = frame.timestamp
+            buffer.append(frame)
+            if frame.timestamp - window_start >= self._config.size_seconds:
+                window_end = frame.timestamp
+                yield WindowBatch(frames=list(buffer), start=window_start, end=window_end)
+                buffer = []
+                window_start = None
+        if buffer:
+            window_end = buffer[-1].timestamp
+            yield WindowBatch(frames=list(buffer), start=window_start or 0.0, end=window_end)

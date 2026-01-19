@@ -10,6 +10,7 @@ def build_fight_prompt(video_time: tuple[float, float]) -> str:
         "{\n"
         '  "video_time": [start, end],\n'
         '  "event": "fight|normal|uncertain",\n'
+        '  "event": "fight | normal | uncertain",\n'
         '  "confidence": number,\n'
         '  "scene_description": string,\n'
         '  "evidence": [string]\n'

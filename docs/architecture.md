@@ -1,4 +1,5 @@
 # v1 架构设计说明（Phase 2）
+# v1 架构设计说明
 
 ## 设计目标
 
@@ -15,6 +16,7 @@ src/
   - sampler.py         # 帧率与采样控制
 - window/
   - sliding_window.py  # 时间窗口管理（Video Time + stride）
+  - sliding_window.py  # 时间窗口管理（Video Time）
 - model/
   - base.py            # 模型接口定义（抽象层）
   - qwen_vl_client.py  # Qwen3-VL v1 实现
@@ -40,6 +42,9 @@ src/
 - 窗口级别输出严格 JSON（`fight|normal|uncertain`）
 - 兼容模型输出夹带说明时的 JSON 提取与降级策略
 - CLI 支持 `--enable_llm`（推理模式）与统计模式
+3. `window.sliding_window` 形成固定时间窗口（Video Time）
+4. `pipeline.analyzer` 负责帧预处理并调用模型
+5. `model.qwen_vl_client` 通过 OpenAI-compatible API 调用 Qwen3-VL
 
 ## 模型选型理由
 

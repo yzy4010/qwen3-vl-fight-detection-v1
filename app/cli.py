@@ -94,6 +94,39 @@ def main() -> None:
         return
 
     for result in pipeline.analyze_stream(reader, sampler, window):
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    config = load_config(Path(args.config))
+
+    reader = VideoStreamReader(args.input)
+    sampler = FrameSampler(SamplingConfig(fps=config["sampling"]["fps"]))
+    windows = SlidingWindow(WindowConfig(size_seconds=config["window"]["size_seconds"]))
+
+    model = QwenVLClient(
+        QwenVLConfig(
+            api_url=config["model"]["api_url"],
+            model_name=config["model"]["name"],
+            timeout_seconds=config["model"]["timeout_seconds"],
+            max_output_tokens=config["model"]["max_output_tokens"],
+        )
+    )
+
+    pipeline = VideoAnalyzerPipeline(
+        model=model,
+        resize_config=ResizeConfig(
+            width=config["resize"]["width"],
+            height=config["resize"]["height"],
+        ),
+        pipeline_config=PipelineConfig(
+            max_frames_per_window=config["pipeline"]["max_frames_per_window"]
+        ),
+    )
+
+    sampled_frames = sampler.sample(reader.read())
+    for result in pipeline.analyze(windows.iterate(sampled_frames)):
         print(format_result(result))
 
 
