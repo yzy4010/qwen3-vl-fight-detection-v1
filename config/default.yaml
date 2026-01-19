@@ -1,0 +1,14 @@
+window:
+  size_seconds: 2.5
+sampling:
+  fps: 2
+resize:
+  width: 640
+  height: 360
+model:
+  api_url: "http://localhost:8000/v1/chat/completions"
+  name: "Qwen3-VL"
+  timeout_seconds: 60
+  max_output_tokens: 512
+pipeline:
+  max_frames_per_window: 8
