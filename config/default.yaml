@@ -1,0 +1,9 @@
+pipeline:
+  window_seconds: 2
+  sample_fps: 5
+  max_frames: 10
+output:
+  save_preview: false
+  preview_path: "./output/preview.jpg"
+logging:
+  level: INFO
