@@ -35,10 +35,12 @@ class SlidingWindow:
             while window_end is not None and frame.timestamp >= window_end:
                 window_frames = [f for f in buffer if window_start <= f.timestamp <= window_end]
                 if window_frames:
+                    actual_start = window_frames[0].timestamp
+                    actual_end = window_frames[-1].timestamp
                     yield WindowBatch(
                         frames=window_frames,
-                        start=window_start,
-                        end=window_end,
+                        start=actual_start,
+                        end=actual_end,
                     )
                 window_start += self._config.stride_seconds
                 window_end = window_start + self._config.window_seconds
@@ -46,4 +48,6 @@ class SlidingWindow:
         if window_start is not None and window_end is not None:
             window_frames = [f for f in buffer if window_start <= f.timestamp <= window_end]
             if window_frames:
-                yield WindowBatch(frames=window_frames, start=window_start, end=window_end)
+                actual_start = window_frames[0].timestamp
+                actual_end = window_frames[-1].timestamp
+                yield WindowBatch(frames=window_frames, start=actual_start, end=actual_end)
