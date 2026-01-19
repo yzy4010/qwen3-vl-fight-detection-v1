@@ -35,26 +35,26 @@ def main() -> None:
     config = load_config(Path(args.config))
 
     reader = VideoStreamReader(args.input)
-    sampler = FrameSampler(SamplingConfig(fps=config["sampling"]["fps"]))
-    windows = SlidingWindow(WindowConfig(size_seconds=config["window"]["size_seconds"]))
+    sampler = FrameSampler(SamplingConfig(fps=config["video"]["sample_fps"]))
+    windows = SlidingWindow(WindowConfig(size_seconds=config["video"]["window_seconds"]))
 
     model = QwenVLClient(
         QwenVLConfig(
-            api_url=config["model"]["api_url"],
-            model_name=config["model"]["name"],
-            timeout_seconds=config["model"]["timeout_seconds"],
-            max_output_tokens=config["model"]["max_output_tokens"],
+            api_url=config["qwen"]["api_url"],
+            model_name=config["qwen"]["model"],
+            timeout_seconds=config["qwen"]["timeout_sec"],
+            max_output_tokens=config["qwen"]["max_output_tokens"],
         )
     )
 
     pipeline = VideoAnalyzerPipeline(
         model=model,
         resize_config=ResizeConfig(
-            width=config["resize"]["width"],
-            height=config["resize"]["height"],
+            width=config["video"]["resize"]["width"],
+            height=config["video"]["resize"]["height"],
         ),
         pipeline_config=PipelineConfig(
-            max_frames_per_window=config["pipeline"]["max_frames_per_window"]
+            max_frames_per_window=config["video"]["max_frames_per_window"]
         ),
     )
 
