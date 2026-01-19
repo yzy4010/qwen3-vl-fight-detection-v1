@@ -13,7 +13,7 @@ if str(SRC_PATH) not in sys.path:
 
 from model.qwen_vl_client import QwenVLClient, QwenVLConfig
 from pipeline.analyzer import PipelineConfig, ResizeConfig, VideoAnalyzerPipeline, format_result
-from stream.reader import VideoStreamReader
+from stream.reader import VideoFrameReader
 from stream.sampler import FrameSampler, SamplingConfig
 from window.sliding_window import SlidingWindow, WindowConfig
 
@@ -34,7 +34,7 @@ def main() -> None:
     args = build_parser().parse_args()
     config = load_config(Path(args.config))
 
-    reader = VideoStreamReader(args.input)
+    reader = VideoFrameReader(args.input)
     sampler = FrameSampler(SamplingConfig(fps=config["video"]["sample_fps"]))
     windows = SlidingWindow(WindowConfig(size_seconds=config["video"]["window_seconds"]))
 
