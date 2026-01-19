@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable, Iterator, Optional
 
 from src.utils.logging_utils import get_logger
-from stream.reader import FrameTuple
+from src.stream.reader import FrameTuple
 
 
 class FrameSampler:
